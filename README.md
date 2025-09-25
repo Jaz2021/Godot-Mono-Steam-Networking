@@ -26,7 +26,7 @@ Your directory structure **must** be as follows:
 
 ---
 
-## 🚀 Initialization
+## Initialization
 
 Before using any networking features, initialize the system:
 
@@ -38,7 +38,7 @@ NetworkingV2.Init(force: false);
 
 ---
 
-## 🎮 Creating a Lobby
+## Creating a Lobby
 
 To create a new multiplayer lobby:
 
@@ -50,7 +50,7 @@ NetworkingV2.CreateLobby();
 
 ---
 
-## ✉️ Sending Packets
+## Sending Packets
 
 To send a packet to a specific connection:
 
@@ -70,7 +70,7 @@ NetworkingV2.SendPacketToAll(packet, reliable);
 
 ---
 
-## 🧱 Adding New Packet Types
+## Adding New Packet Types
 
 Creating new packet types is simple. Just define a new class like this:
 
@@ -99,7 +99,7 @@ public static MyPacketSignal myPacketSignal;
 
 ---
 
-## 📦 Dependencies
+## Dependencies
 
 - Godot (C# support)
 - Steamworks SDK
@@ -107,7 +107,7 @@ public static MyPacketSignal myPacketSignal;
 
 ---
 
-## ✅ Features
+## Features
 
 - Steam lobby creation
 - Reliable and unreliable packet sending
@@ -117,12 +117,12 @@ public static MyPacketSignal myPacketSignal;
 
 ---
 
-## 📃 License
+## License
 
 MIT License (or add your own license here)
 
 ---
 
-## 🙋‍♂️ Support
+## Support
 
 Open an issue or submit a pull request if you'd like to contribute or need help.
