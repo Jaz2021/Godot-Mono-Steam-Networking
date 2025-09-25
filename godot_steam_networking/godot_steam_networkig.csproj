@@ -1,0 +1,14 @@
+<Project Sdk="Godot.NET.Sdk/4.4.1">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <!-- <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>   
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\Generated</CompilerGeneratedFilesOutputPath> -->
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../NetworkingV2Generator/NetworkingV2Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <PackageReference Include="steamworks.net" Version="2024.8.0" />
+
+  </ItemGroup>
+
+</Project>
