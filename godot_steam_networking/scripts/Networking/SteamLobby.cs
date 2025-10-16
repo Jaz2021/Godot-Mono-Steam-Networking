@@ -14,7 +14,7 @@ public class SteamLobby{
     public SteamLobby(CSteamID lobbyToJoin){
         NetworkingV2.playerJoinedSignal += PlayerJoined;
         NetworkingV2.playerLeftSignal += PlayerLeft;
-        Console.Log($"Lobby created to join {lobbyToJoin}");
+        GD.Print($"Lobby created to join {lobbyToJoin}");
         JoinLobby(lobbyToJoin);
         // Globals.instance.root.AddChild(this);
     }
@@ -24,7 +24,7 @@ public class SteamLobby{
     public SteamLobby(){
         NetworkingV2.playerJoinedSignal += PlayerJoined;
         NetworkingV2.playerLeftSignal += PlayerLeft;
-        Console.Log("Lobby created");
+        GD.Print("Lobby created");
         CreateLobby();
         // Globals.instance.root.AddChild(this);
     }
@@ -33,10 +33,10 @@ public class SteamLobby{
         NetworkingV2.playerJoinedSignal -= PlayerJoined;
         NetworkingV2.playerLeftSignal -= PlayerLeft;
         if(((ulong)lobbyId) != 0){
-            Console.Log("Lobby object destroyed without first calling LeaveLobby(). You should figure out what caused that", Console.MessageType.Error);
+            GD.Print("Lobby object destroyed without first calling LeaveLobby(). You should figure out what caused that");
             SteamMatchmaking.LeaveLobby(lobbyId);
         }
-        Console.Log("Lobby object was destroyed", Console.MessageType.Warning);
+        GD.Print("Lobby object was destroyed");
     }
     public void ResetLobby(){
         foreach(var member in lobbyMembers){
@@ -64,18 +64,18 @@ public class SteamLobby{
             if(member.steamID == id){
                 return member;
             } else {
-                // Console.Log($"{id} != {member.steamID}");
+                // GD.Print($"{id} != {member.steamID}");
             }
         }
         return null;
     }
     private void AddLobbyMember(CSteamID mem, bool shouldCreateConnections = false){
-        Console.Log("Adding lobby member: " + mem, Console.MessageType.NetworkingConnections);
+        GD.Print("Adding lobby member: " + mem);
         foreach(var member in lobbyMembers){
-            // Console.Log(member.MemberName);
+            // GD.Print(member.MemberName);
             if(member.steamID == mem){
-                Console.Log($"Tried to readd a lobby member that already exists: {member.memberName}", Console.MessageType.Error);
-                // Console.Log("Tried to readd a lobby member that already exists");
+                GD.Print($"Tried to readd a lobby member that already exists: {member.memberName}");
+                // GD.Print("Tried to readd a lobby member that already exists");
                 return;
             }
         }
@@ -89,10 +89,10 @@ public class SteamLobby{
         }
         LobbyMemberV2 newMem = new(mem, name, shouldCreateConnections);
         lobbyMembers.Add(newMem);
-        Console.Log($"Added child {lobbyMembers.Count}");
+        GD.Print($"Added child {lobbyMembers.Count}");
     }
     private void RemoveLobbyMember(CSteamID mem){
-        Console.Log($"Member: {mem} left the game");
+        GD.Print($"Member: {mem} left the game");
         int i = 0;
         foreach(var member in lobbyMembers){
             if(mem == member.steamID){
@@ -108,7 +108,7 @@ public class SteamLobby{
         unboundSockets.Add(socket);
     }
     public void CreateLobby(){
-        Console.Log("Lobby being created", Console.MessageType.Networking);
+        GD.Print("Lobby being created");
         if(lobbyId != (CSteamID)0){
             ResetLobby();
         }
@@ -117,7 +117,7 @@ public class SteamLobby{
 
     }
     public void PlayerJoined(CSteamID member){
-		Console.Log("Player joined: " + member, Console.MessageType.NetworkingConnections);
+		GD.Print("Player joined: " + member);
 		// var name = SteamFriends.GetFriendPersonaName(member);
         AddLobbyMember(member);
         // PlayerJoinedSignal?.Invoke(member);

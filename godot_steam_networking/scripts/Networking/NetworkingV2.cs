@@ -9,6 +9,10 @@ using Steamworks;
 
 namespace Networking_V2{
     public static partial class NetworkingV2 {
+        	public const int SEND_RELIABLE = 8;
+        // public const int SEND_RELIABLE_NO_DELAY = 4;
+        public const int SEND_UNRELIABLE = 0;
+        public const int SEND_UNRELIABLE_NO_DELAY = 1;
         private static SteamLobby lobby;
         private const int AppId = 480;
         public const int MTU = 1200;

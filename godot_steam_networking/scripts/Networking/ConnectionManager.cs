@@ -18,7 +18,7 @@ public partial class ConnectionManager : Node {
 
     public ConnectionManager(SteamNetworkingIdentity netId, ChannelTypePacket.ChannelType type)
     {
-        Console.Log($"Created outgoing connection manager for: {netId.GetSteamID()}");
+        GD.Print($"Created outgoing connection manager for: {netId.GetSteamID()}");
         // This is for creating an outgoing connection
         // ConnectionId should always be 0 or 1 as of right now because those are the open sockets
         steamID = netId.GetSteamID();
@@ -26,16 +26,16 @@ public partial class ConnectionManager : Node {
         NetworkingV2.AddUnboundSocket(connection);
         ChannelTypePacket packet = new(type, NetworkingV2.steamID);
         SendPacketReliable(packet);
-        Globals.instance.root.AddChild(this); // Add myself as a child so we enter the tree and can process
+        // Globals.instance.root.AddChild(this); // Add myself as a child so we enter the tree and can process
     }
     public ConnectionManager(HSteamNetConnection connection){
         // For creating an incoming connection.
         // What would come up when we accept a p2p connection is this guy
         // this.steamID = steamID;
-        Console.Log($"Created incoming connection manager for connection: {connection.m_HSteamNetConnection}");
+        GD.Print($"Created incoming connection manager for connection: {connection.m_HSteamNetConnection}");
 
         this.connection = connection;
-        Globals.instance.root.AddChild(this);
+        // Globals.instance.root.AddChild(this);
     }
     public void SendPacketUnreliable<T>(IPacket<T> packet, bool individualPacket = false) where T : IPacket<T>{
         var pdata = packet.Serialize();
@@ -44,8 +44,8 @@ public partial class ConnectionManager : Node {
             var intptr = GCHandle.Alloc(pdata, GCHandleType.Pinned);
             IntPtr ptr = intptr.AddrOfPinnedObject();
             Marshal.Copy(pdata, 0, ptr, pdata.Length);
-            var res = SteamNetworkingSockets.SendMessageToConnection(connection, ptr, (uint)pdata.Length, Globals.SEND_RELIABLE, out _);
-            Console.Log($"Sent packet to {connection.m_HSteamNetConnection} with result {res}", Console.MessageType.Networking);
+            var res = SteamNetworkingSockets.SendMessageToConnection(connection, ptr, (uint)pdata.Length, NetworkingV2.SEND_RELIABLE, out _);
+            GD.Print($"Sent packet to {connection.m_HSteamNetConnection} with result {res}");
             // GD.Print("Sent a packet, " + res.ToString());
             // GD.Print(connection.m_HSteamNetConnection);
             intptr.Free();
@@ -61,8 +61,8 @@ public partial class ConnectionManager : Node {
         dataLength += pdata.Length;
     }
     private void SendDataOverConnection(){
-        var res = SteamNetworkingSockets.SendMessageToConnection(connection, data, (uint)dataLength, Globals.SEND_UNRELIABLE, out _);
-        Console.Log($"Sent packet to {connection.m_HSteamNetConnection} with result {res}", Console.MessageType.Networking);
+        var res = SteamNetworkingSockets.SendMessageToConnection(connection, data, (uint)dataLength, NetworkingV2.SEND_UNRELIABLE, out _);
+        GD.Print($"Sent packet to {connection.m_HSteamNetConnection} with result {res}");
         dataLength = 0;
     }
     public void SendPacketReliable<T>(IPacket<T> packet) where T : IPacket<T>{
@@ -71,8 +71,8 @@ public partial class ConnectionManager : Node {
         var intptr = GCHandle.Alloc(data, GCHandleType.Pinned);
         IntPtr ptr = intptr.AddrOfPinnedObject();
         Marshal.Copy(data, 0, ptr, data.Length);
-        var res = SteamNetworkingSockets.SendMessageToConnection(connection, ptr, (uint)data.Length, Globals.SEND_RELIABLE, out _);
-        Console.Log($"Sent packet of length {data.Length} to {connection.m_HSteamNetConnection} with result {res}", Console.MessageType.Networking);
+        var res = SteamNetworkingSockets.SendMessageToConnection(connection, ptr, (uint)data.Length, NetworkingV2.SEND_RELIABLE, out _);
+        GD.Print($"Sent packet of length {data.Length} to {connection.m_HSteamNetConnection} with result {res}");
         // GD.Print("Sent a packet, " + res.ToString());
         // GD.Print(connection.m_HSteamNetConnection);
         intptr.Free();
@@ -86,7 +86,7 @@ public partial class ConnectionManager : Node {
     }
     public void SetSteamId(CSteamID id){
         if(steamID == (CSteamID)0){
-            Console.Log($"Set connection: {connection.m_HSteamNetConnection} to steamid: {id}");
+            GD.Print($"Set connection: {connection.m_HSteamNetConnection} to steamid: {id}");
             steamID = id;
         }
     }
@@ -101,7 +101,7 @@ public partial class ConnectionManager : Node {
         IntPtr[] packets = new nint[10];
         var numPackets = SteamNetworkingSockets.ReceiveMessagesOnConnection(connection, packets, 10);
         for (int i = 0; i < numPackets; i++){
-            // Console.Log("Received a packet");
+            // GD.Print("Received a packet");
             NetworkingV2.ReceivePacket(ref packets[i], this);
         }
     }

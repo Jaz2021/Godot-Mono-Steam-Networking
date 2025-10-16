@@ -4,7 +4,7 @@ namespace Networking_V2{
         // Thats it. Thats all this thing does
         public override void _EnterTree()
         {
-            Console.Log("Steam packet listener created");
+            GD.Print("Steam packet listener created");
         }
         public override void _Process(double delta)
         {
@@ -12,7 +12,7 @@ namespace Networking_V2{
         }
         public override void _ExitTree()
         {
-            Console.Log("Steam packet listener destroyed");
+            GD.Print("Steam packet listener destroyed");
         }
     }
 }
