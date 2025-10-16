@@ -14,6 +14,7 @@ public sealed class PacketAttribute : Attribute {
     using System;
     using Steamworks;
     using System.Runtime.InteropServices;
+    using Godot;
     namespace Networking_V2{
     public static partial class NetworkingV2 {
     public static void ReceivePacket(ref IntPtr data, ConnectionManager connection){
@@ -38,7 +39,7 @@ public sealed class PacketAttribute : Attribute {
             {
                 properType = type2;
             } else {
-                Console.Log($"Message types disagreed [{type}, {type2}, {type3}], dropping rest of packets this tick", Console.MessageType.NetworkingError);
+                GD.Print($"Message types disagreed [{type}, {type2}, {type3}], dropping rest of packets this tick");
                 SteamNetworkingMessage_t.Release(data);
                 return;
             }
@@ -47,7 +48,7 @@ public sealed class PacketAttribute : Attribute {
             {
                 /*CASE*/
                 default:
-                    Console.Log($"Recieved unset packet type, {properType}", Console.MessageType.Networking);
+                    GD.Print($"Recieved unset packet type, {properType}");
                     SteamNetworkingMessage_t.Release(data);
                     return;
             }
@@ -59,7 +60,7 @@ public sealed class PacketAttribute : Attribute {
 """;
     public const string Case = """
     case /*type*/:
-        Console.Log("Received packet of type /*class*/", Console.MessageType.Networking);
+        GD.Print("Received packet of type /*class*/");
         IPacket</*class*/>.DeserializeAndSignal(packet, ref offset, connection, length);
         break;
 """;

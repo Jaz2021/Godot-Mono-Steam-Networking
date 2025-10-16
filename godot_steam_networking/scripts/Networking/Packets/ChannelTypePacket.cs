@@ -5,8 +5,9 @@ using System.Threading.Channels;
 using Godot;
 using Networking_V2;
 using Steamworks;
+namespace Networking_V2;
 [Packet(0)]
-public class ChannelTypePacket : IPacket<ChannelTypePacket>
+public partial class ChannelTypePacket : IPacket<ChannelTypePacket>
 {
     public ChannelTypePacket(ChannelType type, CSteamID steamId){
         channelType = type;
@@ -19,7 +20,9 @@ public class ChannelTypePacket : IPacket<ChannelTypePacket>
         Audio = 1
     }
     public ChannelType channelType;
+
     public CSteamID id;
+    private int test;
     public static ChannelTypePacket Deserialize(IntPtr data, ref int offset, int size)
     {
         // Skip the first byte 
@@ -42,6 +45,6 @@ public class ChannelTypePacket : IPacket<ChannelTypePacket>
     {
         GD.Print($"Serializing channelTYpe packet {id}");
         // Reminder to add the initial byte as 0 since thats the packet type
-        return [0, 0, 0, (byte)channelType, ..BitConverter.GetBytes((ulong)id)];
+        return [0, 0, 0, (byte)channelType, ..BitConverter.GetBytes((ulong)id),];
     }
 }
