@@ -10,6 +10,15 @@ public sealed class PacketAttribute : Attribute {
         Id = id;
     }
 }";
+    public const string SerializeDataAttribute = @"
+using System;
+namespace Networking_V2;
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = false)]
+public sealed class SerializeDataAttribute : Attribute {
+    public SerializeDataAttribute(){
+    }
+}
+    ";
     public const string Net = """
     using System;
     using Steamworks;
@@ -63,5 +72,47 @@ public sealed class PacketAttribute : Attribute {
         GD.Print("Received packet of type /*class*/");
         IPacket</*class*/>.DeserializeAndSignal(packet, ref offset, connection, length);
         break;
-""";
+    """;
+    // Serializer inputs:
+    // class: The class name
+    // id: the number the packet is using
+    // serializers: The list of serializers in alphabetical order by name of the variable (to keep things consistent)
+    // class_vars: The list of serializable data that gets turned into a new value
+    // class_var_inputs: The type name, type name, stuff for the instantiator
+    // class_var_setters: The lines of this.var_name = varname
+    // deserializers: The list of deserializers, in alphabetical order again. Using PtrConverter.
+
+    public const string SerializerClass = """
+    namespace Networking_V2;
+    using System;
+    using Steamworks;
+    /*using*/
+    public partial class /*class*/ : IPacket</*class*/>
+    {
+        public delegate void /*class*/Signal(/*class*/ packet, ConnectionManager connection);
+        public static /*class*/Signal /*class*/Received;
+        public static void Signal(/*class*/ packet, ConnectionManager connection){
+            /*class*/Received?.Invoke(packet, connection);
+        }
+        public /*class*/(/*class_var_inputs*/){
+            /*class_var_setters*/
+        }
+        public byte[] Serialize(){
+            return [
+                /*id*/, /*id*/, /*id*/,
+                /*serializers*/
+            ];
+        }
+        public static /*class*/ Deserialize(IntPtr data, ref int offset, int size)
+        {
+            /*deserializers*/
+            return new(/*class_vars*/);
+        }
+    }
+    """;
+    // name: The variable name to be deserialized
+    // type: The type to be deserialized
+    public const string Deserializer = """
+    var /*name*/ = PtrConverter.Get/*type*/(data, ref offset);
+    """;
 }

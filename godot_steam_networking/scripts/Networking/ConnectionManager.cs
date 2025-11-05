@@ -24,7 +24,7 @@ public partial class ConnectionManager : Node {
         steamID = netId.GetSteamID();
         connection = SteamNetworkingSockets.ConnectP2P(ref netId, (int)type,  0, null);
         NetworkingV2.AddUnboundSocket(connection);
-        ChannelTypePacket packet = new(type, NetworkingV2.steamID);
+        ChannelTypePacket packet = new((byte)type, NetworkingV2.steamID);
         SendPacketReliable(packet);
         // Globals.instance.root.AddChild(this); // Add myself as a child so we enter the tree and can process
     }

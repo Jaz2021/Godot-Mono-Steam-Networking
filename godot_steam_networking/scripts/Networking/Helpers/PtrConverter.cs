@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Godot;
+using Steamworks;
 
 
 public static class PtrConverter
@@ -66,12 +67,22 @@ public static class PtrConverter
         char value = (char)ReadBytes(packet, ref start, 1)[0];
         return value;
     }
-    public static Vector3 GetVector3(IntPtr packet, ref int start){
+    public static Vector3 GetVector3(IntPtr packet, ref int start)
+    {
         var x = GetFloat(packet, ref start);
         var y = GetFloat(packet, ref start);
         var z = GetFloat(packet, ref start);
         return new(x, y, z);
 
+    }
+    public static CSteamID GetCSteamID(IntPtr packet, ref int start)
+    {
+        return (CSteamID)GetULong(packet, ref start);
+    }
+    public static byte GetByte(IntPtr packet, ref int start)
+    {
+        byte value = ReadBytes(packet, ref start, 1)[0];
+        return value;
     }
 
     public static T GetVariant<T>(IntPtr packet, ref int start) where T : class
