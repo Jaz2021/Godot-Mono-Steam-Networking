@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
-    <!-- <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>   
-    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\Generated</CompilerGeneratedFilesOutputPath> -->
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>   
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\Generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../NetworkingV2Generator/NetworkingV2Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />

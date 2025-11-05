@@ -30,11 +30,16 @@ public class NetworkingGenerator : IIncrementalGenerator
             "NetworkingSerializeAttribute.g.cs",
             SourceText.From(SourceGenerationHelper.SerializeDataAttribute, Encoding.UTF8)
         ));
-        IncrementalValueProvider<ImmutableArray<Tuple<string, int>>> packetsToGen = context.SyntaxProvider.ForAttributeWithMetadataName(
+        IncrementalValueProvider<ImmutableArray<string>> packetsToGen = context.SyntaxProvider.ForAttributeWithMetadataName(
             "Networking_V2.PacketAttribute",
         predicate: (s, _) => true,
         transform: (ctx, _) => GetSemanticTargetForGeneration(ctx)).Where(static s => s is not null)
-        .Collect();
+        .Collect()
+        .Select(static (items, _) =>
+            items
+                .OrderBy(static t => t, StringComparer.Ordinal)
+                .ToImmutableArray()
+            );;
         IncrementalValueProvider<ImmutableArray<SerializerTarget>> serializableFields = context.SyntaxProvider.ForAttributeWithMetadataName(
             "Networking_V2.SerializeDataAttribute",
             predicate: (s, _) => true,
@@ -52,15 +57,15 @@ public class NetworkingGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(fullSet, (spc, snippets) =>
         {
             StringBuilder sb = new();
-
+            int type = 0;
             foreach (var packetType in snippets.Right)
             {
                 var str = SourceGenerationHelper.Case;
-                str = str.Replace("/*class*/", packetType.Item1);
-                str = str.Replace("/*type*/", packetType.Item2.ToString());
+                str = str.Replace("/*class*/", packetType);
+                str = str.Replace("/*type*/", type.ToString());
                 string source = SourceGenerationHelper.SerializerClass;
-                source = source.Replace("/*id*/", packetType.Item2.ToString());
-                source = source.Replace("/*class*/", packetType.Item1);
+                source = source.Replace("/*id*/", type.ToString());
+                source = source.Replace("/*class*/", packetType);
                 StringBuilder class_vars = new();
                 StringBuilder class_var_inputs = new();
                 StringBuilder serializers = new();
@@ -69,7 +74,7 @@ public class NetworkingGenerator : IIncrementalGenerator
                 sb.AppendLine(str);
                 foreach (var serializerTarget in snippets.Left)
                 {
-                    if (serializerTarget.superclass != packetType.Item1)
+                    if (serializerTarget.superclass != packetType)
                     {
                         continue; // Skip the serializers that don't match the class we are sorting over
                     }
@@ -89,7 +94,8 @@ public class NetworkingGenerator : IIncrementalGenerator
                 source = source.Replace("/*serializers*/", serializers.ToString());
                 source = source.Replace("/*deserializers*/", deserializers.ToString());
                 // source = source + $"\n/// {serializerTarget.superclass}, {packetType.Item1}";
-                spc.AddSource($"{packetType.Item1}.g.cs", source);
+                spc.AddSource($"{packetType}.g.cs", source);
+                type += 1;
             }
             string joinedCases = sb.ToString();
             string template = SourceGenerationHelper.Net;
@@ -183,26 +189,26 @@ public class NetworkingGenerator : IIncrementalGenerator
         return new(typeSymbol.Name, variableSymbol.Name, classSymbol.Name);
 
     }
-    static Tuple<string, int> GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext context)
+    static string GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext context)
     {
         if (context.TargetSymbol is not INamedTypeSymbol classSymbol){
-            return null;
+            return "";
         }
 
         foreach (var attributeData in classSymbol.GetAttributes()){
 
-            if (attributeData.AttributeClass?.ToDisplayString() == "Networking_V2.PacketAttribute" && attributeData.ConstructorArguments.Length == 1 && attributeData.ConstructorArguments[0].Kind == TypedConstantKind.Primitive && attributeData.ConstructorArguments[0].Value is byte id)
+            if (attributeData.AttributeClass?.ToDisplayString() == "Networking_V2.PacketAttribute")
             {
                 // if(!ImplementsInterface(classSymbol, "Networking_V2.IPacket")){
                 //     return "//Bad Interface";
                 // }
-                
-                return new(classSymbol.Name, id);
+
+                return classSymbol.Name;
             }
         }
 
         // we didn't find the attribute we were looking for
-        return null;
+        return "";
     }   
     private static bool ImplementsInterface(INamedTypeSymbol symbol, string interfaceFullName)
     {

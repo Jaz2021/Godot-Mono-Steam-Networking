@@ -5,9 +5,7 @@ using System;
 namespace Networking_V2;
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class PacketAttribute : Attribute {
-    public byte Id {get;}
-    public PacketAttribute(byte id){
-        Id = id;
+    public PacketAttribute(){
     }
 }";
     public const string SerializeDataAttribute = @"
@@ -39,7 +37,7 @@ public sealed class SerializeDataAttribute : Attribute {
             var type3 = Marshal.ReadByte(packet, offset);
             offset++;
             byte properType = 0;
-            bool foundProperType = false;
+            // bool foundProperType = false;
             if (type == type2 || type == type3)
             {
                 properType = type;
@@ -48,7 +46,7 @@ public sealed class SerializeDataAttribute : Attribute {
             {
                 properType = type2;
             } else {
-                GD.Print($"Message types disagreed [{type}, {type2}, {type3}], dropping rest of packets this tick");
+                // GD.Print($"Message types disagreed [{type}, {type2}, {type3}], dropping rest of packets this tick");
                 SteamNetworkingMessage_t.Release(data);
                 return;
             }
@@ -57,7 +55,7 @@ public sealed class SerializeDataAttribute : Attribute {
             {
                 /*CASE*/
                 default:
-                    GD.Print($"Recieved unset packet type, {properType}");
+                    // GD.Print($"Recieved unset packet type, {properType}");
                     SteamNetworkingMessage_t.Release(data);
                     return;
             }
@@ -86,6 +84,7 @@ public sealed class SerializeDataAttribute : Attribute {
     namespace Networking_V2;
     using System;
     using Steamworks;
+    using Godot;
     /*using*/
     public partial class /*class*/ : IPacket</*class*/>
     {

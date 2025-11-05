@@ -6,7 +6,7 @@ using Godot;
 using Networking_V2;
 using Steamworks;
 namespace Networking_V2;
-[Packet(0)]
+[Packet]
 public partial class ChannelTypePacket : IPacket<ChannelTypePacket>
 {
     public enum ChannelType : byte
@@ -26,4 +26,8 @@ public partial class ChannelTypePacket : IPacket<ChannelTypePacket>
     public byte cType;
     [SerializeData]
     public CSteamID id;
+    private void test()
+    {
+        Serialize();
+    }
 }
