@@ -67,6 +67,7 @@ public partial class ConnectionManager : Node {
     }
     public void SendPacketReliable<T>(IPacket<T> packet) where T : IPacket<T>{
         // Reliable sends happen instantly, no need to package them up. They don't rely on speed in the first place
+        var test = new ChannelTypePacket(2, (CSteamID)12).Serialize();
         var data = packet.Serialize();
         var intptr = GCHandle.Alloc(data, GCHandleType.Pinned);
         IntPtr ptr = intptr.AddrOfPinnedObject();

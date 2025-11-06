@@ -72,30 +72,27 @@ NetworkingV2.SendPacketToAll(packet, reliable);
 
 ## Adding New Packet Types
 
-Creating new packet types is simple. Just define a new class like this:
+Creating new packet types is simple. Just define a new class like this, with all serialized data given a `[SerializeData]` attribute:
 
 ``csharp
-[Packet(0)]
+[Packet]
 public class MyCustomPacket : IPacket<MyCustomPacket>
 {
-    // Your fields and methods here
+    // Your fields heres
+    // For example:
+    [SerializeData]
+    public int IntegerData;
 }
 ``
+### Adding New Serializable Data Types:
 
 ### Notes:
 - Each packet must implement `IPacket<T>`.
-- The `[Packet(x)]` attribute registers the packet with a unique ID (`x`).
-- The unique ID **must** be the first 3 bytes in the packet. These three bytes are used as redundancy to make it incredibly unlikely for a packet to be misinterpreted.
-- It is **recommended** to include a static delegate (event) in each packet type for handling incoming packets:
-
-``csharp
-public delegate void MyPacketSignal(MyPacket packet, ConnectionManager from);
-public static MyPacketSignal myPacketSignal;
-``
-
-- You can then subscribe to `Signal` from any object to handle specific packet types.
-
-> Handling and signaling logic is left to the developer to implement, giving you full flexibility.
+- The `[Packet]` attribute registers the packet with a unique ID according to alphabeical order.
+- The `[Packet]` attribute can be overloaded to pick and choose what functions are automatically generated
+- The `[SerializeData]` attribute assumes that the type in question has an extension method named `.Serialize()` and a function in PtrConverter named `.GetType`.
+- The `[SerializeData]` attribute **does not** work on types with a template or arrays, if you would like to use such, implement a container class to hold them as well as a Serialize() and PtrConverter.Get function.
+- There is currently no size checking implemented, this could theoretically read out of bounds memory and crash whatever project you are working on.
 
 ---
 
@@ -116,6 +113,11 @@ public static MyPacketSignal myPacketSignal;
 - Easily extensible with custom packet types
 
 ---
+
+## TODO
+
+- Implement a size checking on a per packet type basis.
+- - It would be best to have a way to dynamically read packet size for certain packets.
 
 ## License
 

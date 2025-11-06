@@ -105,21 +105,32 @@ public static class PtrConverter
         byte value = ReadBytes(packet, ref start, 1)[0];
         return value;
     }
+    // Infinite length string terminated by \0
+    // public static string GetString(IntPtr packet, ref int start)
+    // {
+    //     // This could theoretically crash with an access out of bounds error, if you want to make it safer
+    //     // implement a check or a max length or something other than ending on a 0 byte
+    //     StringBuilder sb = new();
+    //     while(true) {
+    //         char c = GetChar(packet, ref start);
+    //         if (c == '\0')
+    //         {
+    //             return sb.ToString();
+    //         }
+    //         sb.Append(c);
+    //     }
+    // }
+    // Safer max 2^16 length string
     public static string GetString(IntPtr packet, ref int start)
     {
-        // This could theoretically crash with an access out of bounds error, if you want to make it safer
-        // implement a check or a max length or something other than ending on a 0 byte
+        ushort strLength = GetUShort(packet, ref start);
         StringBuilder sb = new();
-        while(true) {
-            char c = GetChar(packet, ref start);
-            if (c == '\0')
-            {
-                return sb.ToString();
-            }
-            sb.Append(c);
+        for (int i = 0; i < strLength; i++)
+        {
+            sb.Append(GetChar(packet, ref start));
         }
+        return sb.ToString();
     }
-
     public static T GetVariant<T>(IntPtr packet, ref int start) where T : class
     {
         int size = Marshal.SizeOf<T>();

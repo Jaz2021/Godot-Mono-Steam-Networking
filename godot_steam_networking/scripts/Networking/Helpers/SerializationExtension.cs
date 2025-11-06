@@ -6,19 +6,33 @@ using Steamworks;
 
 public static class SerializationExtension
 {
+    // Infinite length strings
+    // public static byte[] Serialize(this string value)
+    // {
+    //     if (value == "")
+    //     {
+    //         return [0];
+    //     }
+    //     value += "\0";
+    //     List<byte> bytes = new();
+    //     foreach (var c in value)
+    //     {
+    //         bytes.Add((byte)c);
+    //     }
+    //     return bytes.ToArray();
+    // }
+    // Safer 2^16 max length strings:
     public static byte[] Serialize(this string value)
     {
-        if (value == "")
-        {
-            return [0];
-        }
-        value += "\0";
         List<byte> bytes = new();
         foreach (var c in value)
         {
             bytes.Add((byte)c);
         }
-        return bytes.ToArray();
+        return [
+            ..((ushort)bytes.Count).Serialize(),
+            ..bytes.ToArray()
+        ];
     }
     public static byte[] Serialize(this byte value)
     {
