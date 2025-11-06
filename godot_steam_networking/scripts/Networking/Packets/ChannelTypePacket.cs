@@ -26,8 +26,12 @@ public partial class ChannelTypePacket : IPacket<ChannelTypePacket>
     public byte cType;
     [SerializeData]
     public CSteamID id;
+    private byte type;
+    private CSteamID steamID;
+
     private void test()
     {
         Serialize();
     }
+
 }

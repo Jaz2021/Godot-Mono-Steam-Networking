@@ -30,14 +30,14 @@ public class NetworkingGenerator : IIncrementalGenerator
             "NetworkingSerializeAttribute.g.cs",
             SourceText.From(SourceGenerationHelper.SerializeDataAttribute, Encoding.UTF8)
         ));
-        IncrementalValueProvider<ImmutableArray<string>> packetsToGen = context.SyntaxProvider.ForAttributeWithMetadataName(
+        IncrementalValueProvider<ImmutableArray<PacketTarget>> packetsToGen = context.SyntaxProvider.ForAttributeWithMetadataName(
             "Networking_V2.PacketAttribute",
         predicate: (s, _) => true,
-        transform: (ctx, _) => GetSemanticTargetForGeneration(ctx)).Where(static s => s is not null)
+        transform: (ctx, _) => GetSemanticTargetForGeneration(ctx)).Where(static s => !s.IsNull())
         .Collect()
         .Select(static (items, _) =>
             items
-                .OrderBy(static t => t, StringComparer.Ordinal)
+                .OrderBy(static t => t.name, StringComparer.Ordinal)
                 .ToImmutableArray()
             );;
         IncrementalValueProvider<ImmutableArray<SerializerTarget>> serializableFields = context.SyntaxProvider.ForAttributeWithMetadataName(
@@ -61,11 +61,23 @@ public class NetworkingGenerator : IIncrementalGenerator
             foreach (var packetType in snippets.Right)
             {
                 var str = SourceGenerationHelper.Case;
-                str = str.Replace("/*class*/", packetType);
+                str = str.Replace("/*class*/", packetType.name);
                 str = str.Replace("/*type*/", type.ToString());
                 string source = SourceGenerationHelper.SerializerClass;
+                if (packetType.generateConstructor)
+                {
+                    source = source.Replace("/*constructor*/", SourceGenerationHelper.Constructor);
+                }
+                if (packetType.generateSerializer)
+                {
+                    source = source.Replace("/*serializer*/", SourceGenerationHelper.SerializerFuncs);
+                }
+                if(packetType.generateSignal)
+                {
+                    source = source.Replace("/*signal*/", SourceGenerationHelper.Signal);
+                }
                 source = source.Replace("/*id*/", type.ToString());
-                source = source.Replace("/*class*/", packetType);
+                source = source.Replace("/*class*/", packetType.name);
                 StringBuilder class_vars = new();
                 StringBuilder class_var_inputs = new();
                 StringBuilder serializers = new();
@@ -74,7 +86,7 @@ public class NetworkingGenerator : IIncrementalGenerator
                 sb.AppendLine(str);
                 foreach (var serializerTarget in snippets.Left)
                 {
-                    if (serializerTarget.superclass != packetType)
+                    if (serializerTarget.superclass != packetType.name)
                     {
                         continue; // Skip the serializers that don't match the class we are sorting over
                     }
@@ -94,7 +106,7 @@ public class NetworkingGenerator : IIncrementalGenerator
                 source = source.Replace("/*serializers*/", serializers.ToString());
                 source = source.Replace("/*deserializers*/", deserializers.ToString());
                 // source = source + $"\n/// {serializerTarget.superclass}, {packetType.Item1}";
-                spc.AddSource($"{packetType}.g.cs", source);
+                spc.AddSource($"{packetType.name}.g.cs", source);
                 type += 1;
             }
             string joinedCases = sb.ToString();
@@ -102,55 +114,8 @@ public class NetworkingGenerator : IIncrementalGenerator
             string finalSource = template.Replace("/*CASE*/", joinedCases);
             // File.WriteAllText("~NetworkingV2_Packets.g.cs", finalSource);
             spc.AddSource("NetworkingV2_packets.g.cs", finalSource);
+            // spc.AddSource("test.g.cs", $"//{snippets.Right.Length}");
         });
-        // {
-        //     StringBuilder sb = new();
-        //     foreach(var snippet in snippets)
-        //     {
-        //         if(snippet == null)
-        //         {
-        //             continue;
-        //         }
-        //         var str = SourceGenerationHelper.Case;
-        //         str = str.Replace("/*class*/", snippet.Item1);
-        //         str = str.Replace("/*type*/", snippet.Item2.ToString());
-        //         StringBuilder class_vars = new();
-        //         StringBuilder class_var_inputs = new();
-        //         StringBuilder serializers = new();
-        //         StringBuilder deserializers = new();
-        //         StringBuilder class_var_setters = new();
-        //         sb.AppendLine(str);
-
-        //         // Now we have an alphabetically sorted immutable array of the different fields in the packet to be serialized along with their names
-        //         context.RegisterSourceOutput(serializableFields, (spc, serializeSnippets) =>
-        //         {
-        //             string source = SourceGenerationHelper.SerializerClass;
-        //             source = source.Replace("/*id*/", snippet.Item2.ToString());
-        //             source =source.Replace("/*class*/", snippet.Item1);
-        //             foreach (var (type, name) in serializeSnippets)
-        //             {
-        //                 class_var_inputs.Append($"{type} {name}, ");
-        //                 class_var_setters.AppendLine($"this.{name} = {name};");
-        //                 class_vars.Append($"{name}, ");
-        //                 serializers.AppendLine($"{name}.Serialize();");
-        //                 deserializers.AppendLine(SourceGenerationHelper.Deserializer.Replace("/*type*/", type).Replace("/*name*/", name));
-        //             }
-        //             source = source.Replace("/*class_var_inputs*/", class_var_inputs.ToString());
-        //             source = source.Replace("/*class_vars*/", class_vars.ToString());
-        //             source = source.Replace("/*class_var_setters*/", class_var_setters.ToString());
-        //             source = source.Replace("/*serializers*/", serializers.ToString());
-        //             source = source.Replace("/*deserializers*/", deserializers.ToString());
-        //             spc.AddSource($"{snippet.Item1}.g.cs", source);
-        //         });
-        //     }
-        //     string joinedCases = sb.ToString();
-        //     string template = SourceGenerationHelper.Net;
-        //     string finalSource = template.Replace("/*CASE*/", joinedCases);
-        //     // File.WriteAllText("~NetworkingV2_Packets.g.cs", finalSource);
-        //     spc.AddSource("NetworkingV2_packets.g.cs", finalSource);
-
-        // });
-
     }
     
     struct SerializerTarget
@@ -189,10 +154,30 @@ public class NetworkingGenerator : IIncrementalGenerator
         return new(typeSymbol.Name, variableSymbol.Name, classSymbol.Name);
 
     }
-    static string GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext context)
+    struct PacketTarget
+    {
+        public PacketTarget() { }
+        public PacketTarget(string name, bool generateSerializer, bool generateConstructor, bool generateSignal)
+        {
+            this.name = name;
+            this.generateConstructor = generateConstructor;
+            this.generateSerializer = generateSerializer;
+            this.generateSignal = generateSignal;
+        }
+        public readonly string name = "";
+        public readonly bool generateConstructor = false;
+        public readonly bool generateSerializer = false;
+        public readonly bool generateSignal = false;
+        public bool IsNull()
+        {
+            return false;
+        }
+    }
+    static PacketTarget GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext context)
     {
         if (context.TargetSymbol is not INamedTypeSymbol classSymbol){
-            return "";
+            // return new("bada", true, true, true);
+            return new();
         }
 
         foreach (var attributeData in classSymbol.GetAttributes()){
@@ -202,13 +187,25 @@ public class NetworkingGenerator : IIncrementalGenerator
                 // if(!ImplementsInterface(classSymbol, "Networking_V2.IPacket")){
                 //     return "//Bad Interface";
                 // }
-
-                return classSymbol.Name;
+                bool generateConstructor = true;
+                bool generateSerializer = true;
+                bool generateSignal = true;
+                if(attributeData.ConstructorArguments.Length > 0)
+                {
+                    if(attributeData.ConstructorArguments[0].Value is int flags)
+                    {
+                        generateConstructor = 0 != (flags & 2);
+                        generateSerializer = 0 != (flags & 1);
+                        generateSignal = 0 != (flags & 4);
+                    }
+                }
+                return new(classSymbol.Name, generateSerializer, generateConstructor, generateSignal);
             }
         }
 
         // we didn't find the attribute we were looking for
-        return "";
+        // return new("badb", true, true, true);
+        return new();
     }   
     private static bool ImplementsInterface(INamedTypeSymbol symbol, string interfaceFullName)
     {

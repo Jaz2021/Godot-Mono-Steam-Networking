@@ -5,7 +5,22 @@ using System;
 namespace Networking_V2;
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class PacketAttribute : Attribute {
-    public PacketAttribute(){
+    [Flags]
+    public enum PacketGenerationFlags
+    {
+        GenerateNothing = 0,
+        GenerateSerializerDeserializer = 1,
+        GenerateConstructor = 2,
+        GenerateSignal = 4
+    }
+    PacketGenerationFlags flags;
+    public PacketAttribute(PacketGenerationFlags flags)
+    {
+        this.flags = flags;
+    }
+    public PacketAttribute()
+    {
+        flags = PacketGenerationFlags.GenerateConstructor | PacketGenerationFlags.GenerateSerializerDeserializer | PacketGenerationFlags.GenerateSignal;
     }
 }";
     public const string SerializeDataAttribute = @"
@@ -88,14 +103,13 @@ public sealed class SerializeDataAttribute : Attribute {
     /*using*/
     public partial class /*class*/ : IPacket</*class*/>
     {
-        public delegate void /*class*/Signal(/*class*/ packet, ConnectionManager connection);
-        public static /*class*/Signal /*class*/Received;
-        public static void Signal(/*class*/ packet, ConnectionManager connection){
-            /*class*/Received?.Invoke(packet, connection);
-        }
-        public /*class*/(/*class_var_inputs*/){
-            /*class_var_setters*/
-        }
+        /*signal*/
+        /*constructor*/
+        
+        /*serializer*/
+    }
+    """;
+    public const string SerializerFuncs = """
         public byte[] Serialize(){
             return [
                 /*id*/, /*id*/, /*id*/,
@@ -107,6 +121,17 @@ public sealed class SerializeDataAttribute : Attribute {
             /*deserializers*/
             return new(/*class_vars*/);
         }
+    """;
+    public const string Constructor = """
+    public /*class*/(/*class_var_inputs*/){
+            /*class_var_setters*/
+        }
+    """;
+    public const string Signal = """
+    public delegate void /*class*/Signal(/*class*/ packet, ConnectionManager connection);
+    public static /*class*/Signal /*class*/Received;
+    public static void Signal(/*class*/ packet, ConnectionManager connection){
+        /*class*/Received?.Invoke(packet, connection);
     }
     """;
     // name: The variable name to be deserialized
