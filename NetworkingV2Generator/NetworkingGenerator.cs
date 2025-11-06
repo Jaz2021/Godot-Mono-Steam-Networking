@@ -98,8 +98,14 @@ public class NetworkingGenerator : IIncrementalGenerator
                     // deserializers.AppendLine($"// {serializerTarget.superclass}, {packetType.Item1}");
                     // source += $"\n//{serializerTarget.superclass}, {packetType.Item1}";
                 }
-                class_var_inputs.Remove(class_var_inputs.Length - 2, 2);
-                class_vars.Remove(class_vars.Length - 2, 2);
+                if(class_var_inputs.Length > 2)
+                {
+                    class_var_inputs.Remove(class_var_inputs.Length - 2, 2);
+                }
+                if(class_vars.Length > 2)
+                {
+                    class_vars.Remove(class_vars.Length - 2, 2);
+                }
                 source = source.Replace("/*class_var_inputs*/", class_var_inputs.ToString());
                 source = source.Replace("/*class_vars*/", class_vars.ToString());
                 source = source.Replace("/*class_var_setters*/", class_var_setters.ToString());
