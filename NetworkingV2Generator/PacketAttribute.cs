@@ -1,4 +1,5 @@
 using System;
+namespace Networking_V2;
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class PacketAttribute : Attribute {
     [Flags]
