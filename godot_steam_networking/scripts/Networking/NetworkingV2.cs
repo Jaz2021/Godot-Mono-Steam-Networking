@@ -21,6 +21,11 @@ namespace Networking_V2{
             private set;
             get;
         } = false;
+        // public static bool isSteamInit
+        // {
+        //     private set;
+        //     get;
+        // } = false;
         private static bool online = false;
         public static CSteamID steamID { private set; get; }
         private static string steamName = "";
@@ -53,8 +58,10 @@ namespace Networking_V2{
                     // --------------------------------
                     // Quit the game here
                     // --------------------------------
-                    
+                    // Globals.Instance.GetTree().Quit();
+
                 }
+                return;
             }
             online = SteamUser.BLoggedOn();
             steamID = SteamUser.GetSteamID();
@@ -88,6 +95,7 @@ namespace Networking_V2{
             lobbyCreatedCallback = Callback<LobbyCreated_t>.Create(LobbyCreated);
             p2pSessionCallback = Callback<P2PSessionRequest_t>.Create(P2PReq);
             personaStateChangeCallback = Callback<PersonaStateChange_t>.Create(PersonaStateChange);
+            ChannelTypePacket.ChannelTypePacketReceived += SetConnectionType;
             GD.Print($"NetworkingV2 initialized, user = {steamID}");
             // GD.Print("Steamnetworking ready");
             isInit = true;
@@ -120,7 +128,7 @@ namespace Networking_V2{
         }
         private static void LobbyCreated(LobbyCreated_t param)
         {
-            GD.Print($"Lobby created {param.m_eResult}");
+            GD.Print($"Lobby created: {param.m_eResult}");
             // GD.Print(param.m_eResult);
             if (param.m_eResult == EResult.k_EResultOK){
                 if((bool)!lobby?.isOwner)
@@ -279,6 +287,10 @@ namespace Networking_V2{
         }
         public static void SendPacketToAll<T>(IPacket<T> packet, bool reliable = false, bool gameplay = true, bool individualPacket = false) where T : IPacket<T>{
             // GD.Print("Sending a packet to everyone");
+            if (!isInit || lobby == null)
+            {
+                return;
+            }
             foreach(var player in lobby?.lobbyMembers){
                 if(player.steamID != steamID){
                     // GD.Print($"Sending packet to {player.memberName}");
@@ -320,7 +332,9 @@ namespace Networking_V2{
             }
             return lobby.lobbyId;
         }
-        public static void SetConnectionType(ConnectionManager connection, ChannelTypePacket.ChannelType type, CSteamID id){
+        public static void SetConnectionType(ChannelTypePacket packet, ConnectionManager connection){
+            var id = packet.id;
+            var type = packet.channelType;
             var member = lobby.GetLobbyMemberById(id);
             if(member == null){
                 GD.Print("Lobby member not set up for some reason");
@@ -342,6 +356,7 @@ namespace Networking_V2{
                                 // Send a start game packet here
                                 // If you want late joining enabled
                                 // ---------------------------------
+                                // Globals.Instance.SendStartGamePacket(member.gameplayConnection);
                             }
                             playerReadySignal?.Invoke(member.gameplayConnection, member.audioConnection);
                             // GD.Print("Player ready sent");
@@ -363,6 +378,7 @@ namespace Networking_V2{
                                 // Send a start game packet here
                                 // If you want late joining enabled
                                 // ---------------------------------
+                                // Globals.Instance.SendStartGamePacket(member.gameplayConnection);
                             }
                             playerReadySignal?.Invoke(member.gameplayConnection, member.audioConnection);
                             // GD.Print("Player ready sent");
