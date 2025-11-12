@@ -1,0 +1,45 @@
+[gd_scene load_steps=8 format=3 uid="uid://dpqlnenu1cphm"]
+
+[ext_resource type="Script" uid="uid://c80pbybfr12nt" path="res://Scripts/Player/PlayerObject.cs" id="1_we6tp"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_we6tp"]
+friction = 2000.0
+rough = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_861e5"]
+albedo_color = Color(0.341176, 0, 0, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_we6tp"]
+material = SubResource("StandardMaterial3D_861e5")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_we6tp"]
+albedo_color = Color(0.133196, 0.133196, 0.133196, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_oansn"]
+material = SubResource("StandardMaterial3D_we6tp")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_861e5"]
+
+[node name="Player" type="RigidBody3D" node_paths=PackedStringArray("FootPos")]
+axis_lock_angular_x = true
+axis_lock_angular_z = true
+physics_material_override = SubResource("PhysicsMaterial_we6tp")
+script = ExtResource("1_we6tp")
+JumpRayLength = 1.0
+FootPos = NodePath("RayCast3D")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("CapsuleMesh_we6tp")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D"]
+transform = Transform3D(0.43166, 0, 0, 0, 0.446159, 0, 0, 0, 0.574868, 0.390907, 0.427323, 0)
+mesh = SubResource("BoxMesh_oansn")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_861e5")
+
+[node name="RayCast3D" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.8765639, 0)
+enabled = false
+target_position = Vector3(0, -0.25, 0)

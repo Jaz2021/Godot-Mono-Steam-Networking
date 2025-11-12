@@ -1,0 +1,56 @@
+[gd_scene load_steps=9 format=3 uid="uid://of6ubng70q68"]
+
+[ext_resource type="Script" uid="uid://cfchhj7wn1u4x" path="res://Scripts/Scenes/Scene.cs" id="1_8k7wh"]
+[ext_resource type="PackedScene" uid="uid://dpqlnenu1cphm" path="res://Objects/Player/Player.tscn" id="2_0f5h7"]
+[ext_resource type="Script" uid="uid://b4k4nqwvm4jgy" path="res://Scripts/Player/MainPlayer.cs" id="4_iufkg"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_8k7wh"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_iufkg"]
+noise = SubResource("FastNoiseLite_8k7wh")
+seamless = true
+as_normal_map = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0f5h7"]
+albedo_color = Color(0.24278057, 0.61014974, 0.29920077, 1)
+normal_enabled = true
+normal_texture = SubResource("NoiseTexture2D_iufkg")
+
+[sub_resource type="BoxMesh" id="BoxMesh_0r02p"]
+material = SubResource("StandardMaterial3D_0f5h7")
+size = Vector3(100, 1, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_b5ayd"]
+size = Vector3(100, 1, 100)
+
+[node name="TestScene" type="Node3D" node_paths=PackedStringArray("objectRoot", "playerController")]
+script = ExtResource("1_8k7wh")
+objectRoot = NodePath("ObjectRoot")
+playerController = NodePath("PlayerController")
+objectPrefabs = Dictionary[int, PackedScene]({
+0: ExtResource("2_0f5h7")
+})
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
+mesh = SubResource("BoxMesh_0r02p")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("BoxShape3D_b5ayd")
+
+[node name="ObjectRoot" type="Node3D" parent="."]
+
+[node name="PlayerController" type="Node" parent="."]
+script = ExtResource("4_iufkg")
+CameraOffset = Vector3(0, 0.5, 0)
+moveSpeedForward = 4000.0
+moveSpeedLR = 3500.0
+sprintMult = 1.5
+JumpForce = 200.0
+lookSens = 0.005
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.48804247, 0.8728199, 0, -0.8728199, 0.48804247, 0, 2.347639, 0)

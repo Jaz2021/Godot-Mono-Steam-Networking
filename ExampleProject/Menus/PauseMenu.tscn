@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://dkn32nsu45o1l"]
+
+[ext_resource type="Script" uid="uid://c1mjywr3h6u8t" path="res://Scripts/Menu/MenuController.cs" id="1_o0cs5"]
+[ext_resource type="Script" uid="uid://dt4nxei6dvf7u" path="res://Scripts/Menu/Menu.cs" id="1_qnjt8"]
+
+[node name="PauseMenu" type="Control" node_paths=PackedStringArray("defaultSubMenu")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_o0cs5")
+defaultSubMenu = NodePath("Control")
+
+[node name="Control" type="Control" parent="." node_paths=PackedStringArray("PreviousMenu")]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_qnjt8")
+PreviousMenu = NodePath(".")

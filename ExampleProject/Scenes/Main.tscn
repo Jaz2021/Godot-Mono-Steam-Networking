@@ -1,0 +1,30 @@
+[gd_scene load_steps=6 format=3 uid="uid://bo3rr8bfrdhe2"]
+
+[ext_resource type="Script" uid="uid://cjs6lmqhrjxq0" path="res://Scripts/Globals.cs" id="1_r150o"]
+[ext_resource type="PackedScene" uid="uid://ba65bybja3enw" path="res://Menus/MainMenu.tscn" id="2_idj7w"]
+[ext_resource type="PackedScene" uid="uid://of6ubng70q68" path="res://Scenes/TestScene.tscn" id="3_kln2b"]
+[ext_resource type="PackedScene" uid="uid://dkn32nsu45o1l" path="res://Menus/PauseMenu.tscn" id="4_rgh2o"]
+[ext_resource type="Script" uid="uid://cssq6sjs1s4li" path="res://Scripts/Player/CameraController.cs" id="5_pbw6q"]
+
+[node name="Root" type="Node" node_paths=PackedStringArray("SceneRoot", "MenuRoot", "PlayerCam", "EnvironmentRoot")]
+script = ExtResource("1_r150o")
+SceneRoot = NodePath("SceneRoot")
+MenuRoot = NodePath("MenuRoot")
+PlayerCam = NodePath("CameraRoot")
+EnvironmentRoot = NodePath("EnvironmentRoot")
+InitialMenu = ExtResource("2_idj7w")
+GameplayScene = ExtResource("3_kln2b")
+PauseMenu = ExtResource("4_rgh2o")
+
+[node name="SceneRoot" type="Node" parent="."]
+
+[node name="MenuRoot" type="CanvasLayer" parent="."]
+
+[node name="EnvironmentRoot" type="Node" parent="."]
+
+[node name="CameraRoot" type="Node3D" parent="."]
+script = ExtResource("5_pbw6q")
+
+[node name="PlayerCam" type="Camera3D" parent="CameraRoot"]
+visible = false
+current = true

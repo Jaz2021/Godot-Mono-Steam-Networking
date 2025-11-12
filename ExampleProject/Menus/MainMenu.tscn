@@ -1,0 +1,93 @@
+[gd_scene load_steps=3 format=3 uid="uid://ba65bybja3enw"]
+
+[ext_resource type="Script" uid="uid://dr6h31n1d7gxy" path="res://Scripts/Menu/MainMenu.cs" id="1_5ncg0"]
+[ext_resource type="Script" uid="uid://dt4nxei6dvf7u" path="res://Scripts/Menu/Menu.cs" id="3_5ncg0"]
+
+[node name="MainMenu" type="Control" node_paths=PackedStringArray("NewGameMenu", "defaultSubMenu")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5ncg0")
+NewGameMenu = NodePath("NewGameMenu")
+defaultSubMenu = NodePath("TitleScreen")
+
+[node name="TitleScreen" type="Control" parent="." node_paths=PackedStringArray("PreviousMenu")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_5ncg0")
+PreviousMenu = NodePath(".")
+
+[node name="NewGame" type="Button" parent="TitleScreen"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.054
+anchor_top = 0.441
+anchor_right = 0.347
+anchor_bottom = 0.577
+offset_left = -0.208
+offset_top = 0.231995
+offset_right = 0.255981
+offset_bottom = 0.103973
+text = "New Game"
+
+[node name="Quit" type="Button" parent="TitleScreen"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.052
+anchor_top = 0.844
+anchor_right = 0.345
+anchor_bottom = 0.98
+offset_left = 0.0960007
+offset_top = 0.0879517
+offset_right = 0.559967
+offset_bottom = -0.0400391
+text = "Quit"
+
+[node name="NewGameMenu" type="Control" parent="." node_paths=PackedStringArray("PreviousMenu")]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_5ncg0")
+PreviousMenu = NodePath("../TitleScreen")
+
+[node name="Button" type="Button" parent="NewGameMenu"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.079
+anchor_top = 0.102
+anchor_right = 0.35
+anchor_bottom = 0.355
+offset_left = -0.00800323
+offset_top = -0.0960007
+offset_right = -0.200012
+offset_bottom = -0.0400085
+text = "Offline"
+
+[node name="OnlineButton" type="Button" parent="NewGameMenu"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.097
+anchor_top = 0.418
+anchor_right = 0.35900003
+anchor_bottom = 0.628
+offset_left = 0.2559967
+offset_top = 0.13598633
+offset_right = 0.43197632
+offset_bottom = 0.055999756
+text = "Online"
+
+[connection signal="pressed" from="TitleScreen/NewGame" to="." method="NewGamePressed"]
+[connection signal="pressed" from="TitleScreen/Quit" to="." method="QuitPressed"]
+[connection signal="pressed" from="NewGameMenu/Button" to="." method="StartOfflineGame"]
+[connection signal="pressed" from="NewGameMenu/OnlineButton" to="." method="StartOnlineGame"]
