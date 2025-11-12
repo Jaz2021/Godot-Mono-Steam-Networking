@@ -35,7 +35,6 @@ NetworkingV2.Init(force: false);
 ``
 
 - `force` (`bool`): If `true`, the game will automatically quit if initialization fails (e.g., Steam is not running).
-
 ---
 
 ## Creating a Lobby
@@ -84,16 +83,28 @@ public class MyCustomPacket : IPacket<MyCustomPacket>
     public int IntegerData;
 }
 ``
+
+---
+
 ### Adding New Serializable Data Types:
+Extend the type with a new `Serialize()` function, for example:
+``csharp
+public static byte[] Serialize(this ExampleClass value){
+    // Turn the class into a byte array here, serializing all contained values in any order you choose.
+    return data;
+}
+``
+You must also add a new function to the `PtrConverter` class which can convert an IntPtr with data in the same order as your Serialize function into the original class. The name of this function must be "GetType" where you replace type with the name of your class. This is case sensitive.
+
+---
 
 ### Notes:
 - Each packet must implement `IPacket<T>`.
 - The `[Packet]` attribute registers the packet with a unique ID according to alphabeical order.
 - The `[Packet]` attribute can be overloaded to pick and choose what functions are automatically generated
-- The `[SerializeData]` attribute assumes that the type in question has an extension method named `.Serialize()` and a function in PtrConverter named `.GetType`.
 - The `[SerializeData]` attribute **does not** work on types with a template or arrays, if you would like to use such, implement a container class to hold them as well as a Serialize() and PtrConverter.Get function.
 - There is currently no size checking implemented, this could theoretically read out of bounds memory and crash whatever project you are working on.
-
+- In order to actually create a lobby and receive packets, `SteamAPI.RunCallbacks()` must be called consistently. Typically this is best to run either once every frame or once every physics update, depending on your latency/overhead needs.
 ---
 
 ## Dependencies

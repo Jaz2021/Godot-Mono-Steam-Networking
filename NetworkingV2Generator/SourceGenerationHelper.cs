@@ -82,7 +82,7 @@ public sealed class SerializeDataAttribute : Attribute {
 """;
     public const string Case = """
     case /*type*/:
-        GD.Print("Received packet of type /*class*/");
+        // GD.Print("Received packet of type /*class*/");
         IPacket</*class*/>.DeserializeAndSignal(packet, ref offset, connection, length);
         break;
     """;
