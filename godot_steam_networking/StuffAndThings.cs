@@ -4,11 +4,17 @@ using System;
 
 public partial class StuffAndThings : Node2D
 {
-    [ExportToolButton("Open lobby")]
+    [Export]
     private bool OpenLobby {
         set{
-            NetworkingV2.CreateLobby();
-            InLobby = true;
+            if(value){
+                NetworkingV2.Init(this, true);
+                if(NetworkingV2.isInit){
+                    NetworkingV2.CreateLobby();
+                    InLobby = true;
+                }
+
+            }
         }
         get => false;
     }
@@ -18,8 +24,14 @@ public partial class StuffAndThings : Node2D
     public override void _Ready()
     {
         NetworkingV2.StartGame += StartGame;
+        NetworkingV2.QuitGame += QuitGame;
         VeryLongPacket.VeryLongPacketReceived += PacketRecvd;
-        NetworkingV2.Init(this, true);
+        NetworkingV2.Init(this, false);
+    }
+
+    private void QuitGame()
+    {
+        // throw new NotImplementedException();
     }
 
     private void PacketRecvd(VeryLongPacket packet, ConnectionManager connection)

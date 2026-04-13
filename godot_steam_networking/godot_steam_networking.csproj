@@ -8,7 +8,7 @@
     <!-- <DefineConstants>$(DefineConstants);BATCHING_ENABLED</DefineConstants> -->
     <DefineConstants>$(DefineConstants);TIMESTAMP_DEBUG</DefineConstants>
     <!-- <DefineConstants>$(DefineConstants);ICE_DISABLED</DefineConstants> -->
-    <!-- <DefineConstants>$(DefineConstants);NET_DEBUG</DefineConstants> -->
+    <DefineConstants>$(DefineConstants);NET_DEBUG</DefineConstants>
     <!-- <DefineConstants>$(DefineConstants);NET_DEBUG_FULL</DefineConstants> -->
     <!-- <DefineConstants>$(DefineConstants);TIMESTAMP_DEBUG</DefineConstants> -->
   </PropertyGroup>

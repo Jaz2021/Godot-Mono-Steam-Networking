@@ -15,6 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Godot-Mono-Steam-Networking"
+run/main_scene="uid://wb02o16hs65u"
 config/features=PackedStringArray("4.6", "C#")
 config/icon="res://icon.svg"
 
