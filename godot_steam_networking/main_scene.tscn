@@ -4,4 +4,3 @@
 
 [node name="Node2D" type="Node2D" unique_id=2108927377]
 script = ExtResource("1_0f027")
-OpenLobby = true

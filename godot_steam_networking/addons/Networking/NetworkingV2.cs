@@ -160,7 +160,7 @@ namespace Networking_V2{
                     Debugger.PrintErr($"Networking Init: Invalid socket {i}");
                 }
             }
-            #if NET_DEBUG
+            #if ICE_DISABLED
                 IntPtr result = Marshal.AllocHGlobal(sizeof(int));
                 ulong cbresult = sizeof(int);
                     ESteamNetworkingConfigDataType d;
@@ -250,15 +250,16 @@ namespace Networking_V2{
         }
 #endif
         private static void Tick(){
-
+            // Debugger.Print("Ticker running");
             OnTick?.Invoke();
+            SteamAPI.RunCallbacks();
+
             // Debugger.Print($"Dequeueing {packetQueue.Count} packets this tick");
             while(packetQueue.TryDequeue(out var packet)){
                 // if(packet.data[0] == )
                 Debugger.Print($"Deserializing a packet {packet.data[0]} {packet.data[1]} {packet.data[2]}");
                 DeserializePacket(packet.data, packet.connection);
             }
-
             // Debugger.Print($"Queue count: {packetQueue.Count}");
             // Debugger.Print(SteamNetworkingSockets.GetConnectionRealTimeStatus())
         }

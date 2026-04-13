@@ -37,6 +37,11 @@ public partial class StuffAndThings : Node2D
     private void PacketRecvd(VeryLongPacket packet, ConnectionManager connection)
     {
         // throw new NotImplementedException();
+        if(packet.long_data == "25674246792104874934822980141931959864283908644156242972735646751567820875438417406459986988104926605712289119417336554371479183195909950166498736937116518902860215153729893576185791261097713386010067462393475587777949505580133827817678994899344051790636214635988655652689742671483793990554208789881027384954026719978795"){
+            Debugger.Print($"Received packet with normal data");
+        } else {
+            Debugger.Print("Received packet with malformed data");
+        }
     }
 
     public override void _Process(double delta)
