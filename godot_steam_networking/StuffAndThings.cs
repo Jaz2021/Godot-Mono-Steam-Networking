@@ -41,7 +41,7 @@ public partial class StuffAndThings : Node2D
         if(packet.long_data == PacketData){
             Debugger.Print($"Received packet with normal data");
         } else {
-            Debugger.Print("Received packet with malformed data");
+            Debugger.Print($"Received packet with malformed data {packet.long_data}");
         }
     }
 

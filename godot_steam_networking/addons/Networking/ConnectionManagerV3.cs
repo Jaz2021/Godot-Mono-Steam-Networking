@@ -13,8 +13,9 @@ public partial class ConnectionManager {
     private IntPtr data = IntPtr.Zero;
     // private const float TimeBetweenPackets = 1f / 60f; // How many seconds between each packet send
     private int dataLength;
-    private const int maxDataLength = 1200;
     #endif
+    private const int maxDataLength = 1200;
+
     // private float accumulatedTime = 0f;
     private readonly object locker = new();
     public CSteamID steamID {
@@ -153,12 +154,26 @@ public partial class ConnectionManager {
         do
         {
             numPackets = SteamNetworkingSockets.ReceiveMessagesOnConnection(connection, packets, 10);
+            if(numPackets < 0){
+                Debugger.PrintErr($"Connection got negative packets {numPackets} error, connection dropped");
+                DropConnection();
+            }
             for (int i = 0; i < numPackets; i++){
-                NetworkingV2.ReceivePacket(ref packets[i], this);
+                var pkt = SteamNetworkingMessage_t.FromIntPtr(packets[i]);
+                var length = pkt.m_cbSize;
+                if (length <= 0 || length > maxDataLength){
+                    Debugger.PrintErr($"Received length out of bounds of {length}");
+                    continue;
+                }
+                var packet = pkt.m_pData;
+                byte[] managedData = new byte[length];
+                Marshal.Copy(packet, managedData, 0, length);
+                NetworkingV2.ReceivePacket(managedData, this);
+                pkt.Release();
             }
             packets_received += numPackets;
         } while (numPackets == 10);
-        Debugger.Print($"Received {packets_received} packets this tick");
+        // Debugger.Print($"Received {packets_received} packets this tick");
         SteamNetConnectionRealTimeStatus_t status = new();
         SteamNetConnectionRealTimeLaneStatus_t laneStatus = new SteamNetConnectionRealTimeLaneStatus_t();
         var t = SteamNetworkingSockets.GetConnectionRealTimeStatus(connection, ref status, 1, ref laneStatus);
