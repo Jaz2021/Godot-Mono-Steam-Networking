@@ -39,17 +39,18 @@ public sealed class SerializeDataAttribute : Attribute {
     using Godot;
     namespace Networking_V2{
     public static partial class NetworkingV2 {
-    public static void ReceivePacket(ref IntPtr data, ConnectionManager connection){
-        var pkt = Marshal.PtrToStructure<SteamNetworkingMessage_t>(data);
-        var length = pkt.m_cbSize;
-        var packet = pkt.m_pData;
+    public static void DeserializePacket(byte[] data, ConnectionManager connection){
         int offset = 0;
-        while(offset + 3 < pkt.m_cbSize){
-            var type = Marshal.ReadByte(packet, offset);
+        int length = data.Length;
+        // Debugger.Print($"Received a packet {data[0]}, {data[1]}, {data[2]}");
+        #if BATCHING_ENABLED
+        while(offset + 3 < length){
+        #endif
+            var type = data[offset];
             offset++;
-            var type2 = Marshal.ReadByte(packet, offset);
+            var type2 = data[offset];
             offset++;
-            var type3 = Marshal.ReadByte(packet, offset);
+            var type3 = data[offset];
             offset++;
             byte properType = 0;
             // bool foundProperType = false;
@@ -62,7 +63,6 @@ public sealed class SerializeDataAttribute : Attribute {
                 properType = type2;
             } else {
                 // GD.Print($"Message types disagreed [{type}, {type2}, {type3}], dropping rest of packets this tick");
-                SteamNetworkingMessage_t.Release(data);
                 return;
             }
                 
@@ -71,19 +71,19 @@ public sealed class SerializeDataAttribute : Attribute {
                 /*CASE*/
                 default:
                     // GD.Print($"Recieved unset packet type, {properType}");
-                    SteamNetworkingMessage_t.Release(data);
                     return;
             }
+        #if BATCHING_ENABLED
         }
-        SteamNetworkingMessage_t.Release(data);
+        #endif
     }
 }
 }
 """;
     public const string Case = """
     case /*type*/:
-        // GD.Print("Received packet of type /*class*/");
-        IPacket</*class*/>.DeserializeAndSignal(packet, ref offset, connection, length);
+        GD.Print("Received packet of type /*class*/");
+        IPacket</*class*/>.DeserializeAndSignal(data, ref offset, connection, length);
         break;
     """;
     // Serializer inputs:
@@ -116,7 +116,7 @@ public sealed class SerializeDataAttribute : Attribute {
                 /*serializers*/
             ];
         }
-        public static /*class*/ Deserialize(IntPtr data, ref int offset, int size)
+        public static /*class*/ Deserialize(byte[] data, ref int offset, int size)
         {
             /*deserializers*/
             return new(/*class_vars*/);
@@ -131,6 +131,7 @@ public sealed class SerializeDataAttribute : Attribute {
     public delegate void /*class*/Signal(/*class*/ packet, ConnectionManager connection);
     public static /*class*/Signal /*class*/Received;
     public static void Signal(/*class*/ packet, ConnectionManager connection){
+        // GD.Print("/*class*/");
         /*class*/Received?.Invoke(packet, connection);
     }
     """;

@@ -93,10 +93,18 @@ public static class SerializationExtension
             .. BitConverter.GetBytes(value.Y),
             .. BitConverter.GetBytes(value.Z)];
     }
+    public static byte[] Serialize(this Basis value){
+        return [.. value.Column0.Serialize(), ..value.Column1.Serialize(), .. value.Column2.Serialize()];
+    }
+    public static byte[] Serialize(this Transform3D value){
+        return [.. value.Basis.Serialize(), ..value.Origin.Serialize()];
+    }
     public static byte[] Serialize(this CSteamID value)
     {
         return ((ulong)value).Serialize();
     }
-    
+    public static byte[] Serialize(this Vector2 value){
+        return [.. value.X.Serialize(), .. value.Y.Serialize()];
+    }
 
 }

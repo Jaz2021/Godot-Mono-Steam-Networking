@@ -11,6 +11,9 @@
     <!-- <DefineConstants>$(DefineConstants);NET_DEBUG</DefineConstants> -->
     <!-- <DefineConstants>$(DefineConstants);NET_DEBUG_FULL</DefineConstants> -->
     <!-- <DefineConstants>$(DefineConstants);TIMESTAMP_DEBUG</DefineConstants> -->
+
+
+
   </PropertyGroup>
   <ItemGroup>
     <Content Include="../libsteam_api.so">
