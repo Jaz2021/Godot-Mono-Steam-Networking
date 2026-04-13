@@ -52,6 +52,7 @@ public partial class StuffAndThings : Node2D
             if(accumulatedDelta >= PacketSendTimeout){
                 VeryLongPacket packet = new(PacketData);
                 NetworkingV2.SendPacketToAll(packet);
+                accumulatedDelta = 0;
             }
         }
     }

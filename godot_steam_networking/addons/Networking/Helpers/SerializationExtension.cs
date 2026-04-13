@@ -30,7 +30,7 @@ public static class SerializationExtension
             bytes.Add((byte)c);
         }
         return [
-            ..((ushort)bytes.Count).Serialize(),
+            ..bytes.Count.Serialize(),
             ..bytes.ToArray()
         ];
     }

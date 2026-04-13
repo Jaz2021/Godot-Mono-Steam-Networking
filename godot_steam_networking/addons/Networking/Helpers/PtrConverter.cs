@@ -181,7 +181,7 @@ public static class PtrConverter
     // Safer max 2^16 length string
     public static string GetString(byte[] packet, ref int start)
     {
-        ushort strLength = GetUShort(packet, ref start);
+        int strLength = GetInt32(packet, ref start);
         if (start + strLength > packet.Length)
         {
             return "";
