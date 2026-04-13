@@ -53,6 +53,7 @@ public class SteamLobby{
         if(lobbyToJoin == lobbyId){
             return; // Early escape
         }
+        Debugger.Print($"Actually joining lobby");
         SteamMatchmaking.JoinLobby(lobbyToJoin);
         lobbyId = lobbyToJoin;
         isOwner = false;
