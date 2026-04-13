@@ -22,6 +22,7 @@ namespace Networking_V2{
         public const int SEND_RELIABLE = 8;
         public const int SEND_UNRELIABLE = 0;
         public const int SEND_UNRELIABLE_NO_DELAY = 1;
+        public const int MAX_PLAYER_COUNT = 4;
         private static SteamLobby lobby = null;
         private const int AppId = 480;
         public static int fps;
@@ -304,16 +305,6 @@ namespace Networking_V2{
                     }
                     // lobby = new((CSteamID)param.m_ulSteamIDLobby);
                 }
-
-                // lobbyId = (CSteamID)param.m_ulSteamIDLobby;
-                // Debugger.Print(lobbyId + ", created");
-                // displayMessage("Created Lobby: " + lobbyNameEditor.Text);
-                // SteamMatchmaking.SetLobbyData(lobbyId, "name", "NoName");
-                // var name = SteamMatchmaking.GetLobbyData(lobbyId, "name");
-                // chatTitle.Text = name;
-                // getLobbyMembers();
-                // Steam.AllowP2PPacketRelay(true);
-                // addLobbyMember(SteamNetworking.instance.steamId);
             }
         }
 

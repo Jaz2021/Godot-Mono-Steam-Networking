@@ -118,7 +118,7 @@ public class SteamLobby{
             ResetLobby();
         }
         AddLobbyMember(SteamUser.GetSteamID());
-        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, 4);
+        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, NetworkingV2.MAX_PLAYER_COUNT);
 
     }
     public void PlayerJoined(CSteamID member){
