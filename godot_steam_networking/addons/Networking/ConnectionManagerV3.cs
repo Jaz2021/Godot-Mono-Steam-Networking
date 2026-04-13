@@ -169,7 +169,7 @@ public partial class ConnectionManager {
                 byte[] managedData = new byte[length];
                 Marshal.Copy(packet, managedData, 0, length);
                 NetworkingV2.ReceivePacket(managedData, this);
-                pkt.Release();
+                SteamNetworkingMessage_t.Release(packets[i]);
             }
             packets_received += numPackets;
         } while (numPackets == 10);
