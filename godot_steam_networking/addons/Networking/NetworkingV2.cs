@@ -367,19 +367,14 @@ namespace Networking_V2{
         public static void AddUnboundSocket(HSteamNetConnection socket){
             lobby.unboundSockets.Add(socket);
         }
-        public static void ReceivePacket(ref IntPtr data, ConnectionManager connection){
+        public static void ReceivePacket(byte[] data, ConnectionManager connection){
             // Debugger.Print("Received packet");
-            var pkt = Marshal.PtrToStructure<SteamNetworkingMessage_t>(data);
-            var length = pkt.m_cbSize;
-            var packet = pkt.m_pData;
-            byte[] managedData = new byte[length];
-            Marshal.Copy(packet, managedData, 0, length);
+
             packetQueue.Enqueue(new()
             {
-                data = managedData,
+                data = data,
                 connection = connection
             });
-            SteamNetworkingMessage_t.Release(data);
         }
         private static void NetworkConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t param)
         {
