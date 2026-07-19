@@ -9,6 +9,8 @@ using Steamworks;
 public partial class ConnectionManager {
     // private bool ConnectionEstablished = true;
     private HSteamNetConnection connection;
+    private IntPtr[] packets = new nint[10];
+
     #if BATCHING_ENABLED
     private IntPtr data = IntPtr.Zero;
     // private const float TimeBetweenPackets = 1f / 60f; // How many seconds between each packet send
@@ -145,24 +147,30 @@ public partial class ConnectionManager {
             steamID = id;
         }
     }
+
     public void tick()
     {
 
-        IntPtr[] packets = new nint[10];
         int packets_received = 0;
         int numPackets;
-        do
+        while(true)
         {
             numPackets = SteamNetworkingSockets.ReceiveMessagesOnConnection(connection, packets, 10);
             if(numPackets < 0){
                 Debugger.PrintErr($"Connection got negative packets {numPackets} error, connection dropped");
                 DropConnection();
+                break;
+            }
+            if(numPackets == 0){
+                break;
             }
             for (int i = 0; i < numPackets; i++){
                 var pkt = SteamNetworkingMessage_t.FromIntPtr(packets[i]);
                 var length = pkt.m_cbSize;
                 if (length <= 0 || length > maxDataLength){
                     Debugger.PrintErr($"Received length out of bounds of {length}");
+                    SteamNetworkingMessage_t.Release(packets[i]);
+
                     continue;
                 }
                 var packet = pkt.m_pData;
@@ -172,7 +180,7 @@ public partial class ConnectionManager {
                 SteamNetworkingMessage_t.Release(packets[i]);
             }
             packets_received += numPackets;
-        } while (numPackets == 10);
+        }
         // Debugger.Print($"Received {packets_received} packets this tick");
         SteamNetConnectionRealTimeStatus_t status = new();
         SteamNetConnectionRealTimeLaneStatus_t laneStatus = new SteamNetConnectionRealTimeLaneStatus_t();
